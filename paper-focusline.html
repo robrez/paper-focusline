@@ -1,0 +1,178 @@
+<!--
+@license
+See license at https://github.com/robrez/paper-focusline/blob/master/LICENSE
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+
+<!--
+`paper-focusline`
+A stylish focus indicator
+
+@demo demo/index.html
+-->
+<dom-module id="paper-focusline">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: absolute;
+        pointer-events: none;
+        outline: none;
+        width: 2px;
+        height: 2px;
+        background: var(--primary-color, #3F51B5);
+        -webkit-transform-origin: center center;
+        transform-origin: center center;
+        -webkit-transform: scale3d(1, 0, 1);
+        transform: scale3d(1, 0, 1);
+        @apply(--paper-focusline);
+      }
+
+      :host([position="top"]),
+      :host([position="bottom"]) {
+        -webkit-transform: scale3d(0, 1, 1);
+        transform: scale3d(0, 1, 1);
+      }
+
+      :host([target-focused]) {
+        -webkit-transform: none;
+        transform: none;
+        -webkit-transition: -webkit-transform 0.25s;
+        transition: transform 0.25s;
+        @apply(--paper-transition-easing);
+      }
+    </style>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'paper-focusline',
+      properties: {
+        for: {
+          type: Object,
+          value: function() {
+            return null;
+          }
+        },
+        position: {
+          type: String,
+          value: 'bottom'
+        },
+        offset: {
+          type: Number,
+          value: 0
+        },
+        targetFocused: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        }
+      },
+
+      behaviors: [
+        Polymer.IronResizableBehavior
+      ],
+      observers: [
+        '_settingsChanged(isAttached, for, position, offset)'
+      ],
+      listeners: {
+        'iron-resize': '_updateMetrics'
+      },
+
+      attached: function() {
+        this._isAttached = true;
+      },
+
+      detached: function() {
+        this._isAttached = false;
+      },
+
+      get target() {
+        return this.for;
+      },
+
+      _settingsChanged: function(attached, target, position, offset) {
+        if (this._oldTarget) {
+          this._toggleListeners(attached, this._oldTarget);
+          this._oldTarget = null;
+        }
+        if (typeof target === 'string') {
+          this.for = this.domHost ? this.domHost.$[target] :
+            Polymer.dom(this.ownerDocument).querySelector('#' + target);
+        } else if (this._isValidTarget()) {
+          this._boundFocusHandler = this._boundFocusHandler || this._focusHandler
+            .bind(this);
+          this._boundBlurHandler = this._boundBlurHandler || this._blurHandler
+            .bind(this);
+          this._toggleListeners(attached, target);
+          this._oldTarget = target;
+          this.async(this.notifyResize, 1);
+        }
+      },
+
+      _updateMetrics: function() {
+        if (!this._isValidTarget() || !this.offsetParent) {
+          return;
+        }
+        var targetRect = this.for.getBoundingClientRect();
+        var parentRect = this.offsetParent.getBoundingClientRect();
+
+        var top = targetRect.top - parentRect.top;
+        var left = targetRect.left - parentRect.left;
+        var thisRect = this.getBoundingClientRect();
+        var position = this.position;
+
+        if (position == 'left') {
+          this.style.height = targetRect.height + "px";
+          this.style.left = left - this.offset - thisRect.width + "px";
+          this.style.top = top + "px";
+        } else if (position == 'right') {
+          this.style.height = targetRect.height + "px";
+          this.style.left = left + targetRect.width + this.offset + "px";
+          this.style.top = top + "px";
+        } else if (position == 'top') {
+          this.style.width = targetRect.width + "px";
+          this.style.left = left + "px";
+          this.style.top = top - this.offset - thisRect.height + "px";
+        } else {
+          this.style.width = targetRect.width + "px";
+          this.style.left = left + "px";
+          this.style.top = top + targetRect.height + this.offset + "px";
+        }
+      },
+
+      _focusHandler: function(e) {
+        this.targetFocused = true;
+      },
+      _blurHandler: function(e) {
+        this.targetFocused = false;
+      },
+
+      _toggleListeners: function(attached, target) {
+        var target = this.for;
+        var focusHandler = this._boundFocusHandler;
+        var blurHandler = this._boundBlurHandler;
+        if (target && focusHandler && blurHandler) {
+          if (attached) {
+            target.addEventListener('focus', focusHandler);
+            target.addEventListener('blur', blurHandler);
+          } else {
+            target.removeEventListener('focus', focusHandler);
+            target.removeEventListener('blur', blurHandler);
+          }
+        }
+      },
+
+      /**
+       * Returns true if the  target is a valid HTMLElement.
+       *
+       * @return {boolean}
+       */
+      _isValidTarget: function() {
+        return this.for instanceof HTMLElement;
+      }
+
+    });
+  </script>
+</dom-module>

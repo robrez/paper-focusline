@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+  <title>paper-focusline demo</title>
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="../paper-focusline.html">
+
+  <style is="custom-style" include="demo-pages-shared-styles">
+    .row {
+      padding: 8px 0;
+    }
+    input, button, select {
+      margin: 0 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="vertical-section-container centered">
+    <h3>Basic paper-focusline demo</h3>
+    <demo-snippet>
+      <template>
+        <div class="row">
+          <div><code>for=:id of target:|target HTMLElement</code></div>
+          <div><code>position=top|left|bottom(default)|right</code></div>
+        </div>
+        <div class="row">
+          <label for="top">Top</label>
+          <select id="top" placeholder="Top">
+            <options>
+              <option>Red</option>
+              <option>Green</option>
+              <option>Blue</option>
+            </options>
+          </select>
+          <paper-focusline for="top" position="top"></paper-focusline>
+        </div>
+        <div class="row">
+          <label for="bottom">Bottom</label>
+          <input id="bottom" placeholder="Bottom"></input>
+          <paper-focusline for="bottom" position="bottom"></paper-focusline>
+        </div>
+        <div class="row">
+          <label for="left">Left</label>
+          <input id="left" placeholder="Left"></input>
+          <paper-focusline for="left" position="left"></paper-focusline>
+        </div>
+        <div class="row">
+          <label for="right">Right</label>
+          <button id="right">Button</button>
+          <paper-focusline for="right" position="right"></paper-focusline>
+        </div>
+      </template>
+    </demo-snippet>
+
+    <demo-snippet>
+      <template>
+        <div class="row">
+          <label for="styleInput">Style</label>
+          <input id="styleInput" placeholder="Style Mixin"></input>
+          <paper-focusline class="style" for="styleInput" position="bottom"></paper-focusline>
+          <paper-focusline class="style" for="styleInput" position="top"></paper-focusline>
+        </div>
+        <div class="row">
+          <label for="styleInput">Offset</label>
+          <input id="offsetInput" placeholder="Offset Example"></input>
+          <paper-focusline class="style" for="offsetInput" position="top" offset="4"></paper-focusline>
+        </div>
+        <style is="custom-style">
+          paper-focusline.style {
+            --paper-focusline: {
+              background: linear-gradient(to right,#fff 0,#0085b2 33%,#ff007f 66%,#000 100%);
+              height: 4px;
+            };
+          }
+        </style>
+      </template>
+    </demo-snippet>
+
+  </div>
+</body>
+
+</html>
