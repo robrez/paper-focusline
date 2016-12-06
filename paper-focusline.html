@@ -6,8 +6,21 @@ See license at https://github.com/robrez/paper-focusline/blob/master/LICENSE
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 
 <!--
-`paper-focusline`
-A stylish focus indicator
+`paper-focusline` is a material-design inspired focus indicator. It can target any focusable element
+
+Example:
+
+    <input id="myInput"></input>
+    <paper-focusline for="myInput" position="top"></paper-focusline>
+
+### Styling
+
+The following custom properties and mixins are available for styling
+
+Custom property | Description | Default
+----------------|-------------|----------
+`--paper-focusline` | Mixin applied to the focusline | {}
+
 
 @demo demo/index.html
 -->
@@ -49,49 +62,61 @@ A stylish focus indicator
     Polymer({
       is: 'paper-focusline',
       properties: {
+        /**
+         * Target element whose focus should be detected.
+         * Can be an id or an HTMLElement.
+         */
         for: {
           type: Object,
           value: function() {
             return null;
           }
         },
+        /**
+         * Relatve to the target element, where should the indicator be placed
+         * `top|left|bottom|right`
+         */
         position: {
           type: String,
           value: 'bottom'
         },
+        /**
+         * How far, in px, to offset the indicator position
+         */
         offset: {
           type: Number,
           value: 0
         },
+        /**
+         * True of the target element has focus
+         */
         targetFocused: {
           type: Boolean,
           value: false,
-          reflectToAttribute: true
+          reflectToAttribute: true,
+          notify: true
         }
       },
 
       behaviors: [
         Polymer.IronResizableBehavior
       ],
+
       observers: [
         '_settingsChanged(isAttached, for, position, offset)'
       ],
+
       listeners: {
         'iron-resize': '_updateMetrics'
-      },
-
-      attached: function() {
-        this._isAttached = true;
-      },
-
-      detached: function() {
-        this._isAttached = false;
       },
 
       get target() {
         return this.for;
       },
 
+      /**
+       * Updates metrics whenever critical properties change
+       */
       _settingsChanged: function(attached, target, position, offset) {
         if (this._oldTarget) {
           this._toggleListeners(attached, this._oldTarget);
@@ -111,6 +136,9 @@ A stylish focus indicator
         }
       },
 
+      /**
+       * Computes size and position metrics and updates style properties
+       */
       _updateMetrics: function() {
         if (!this._isValidTarget() || !this.offsetParent) {
           return;
@@ -145,10 +173,14 @@ A stylish focus indicator
       _focusHandler: function(e) {
         this.targetFocused = true;
       },
+
       _blurHandler: function(e) {
         this.targetFocused = false;
       },
 
+      /**
+       * Adds or removes event listeners as needed
+       */
       _toggleListeners: function(attached, target) {
         var target = this.for;
         var focusHandler = this._boundFocusHandler;

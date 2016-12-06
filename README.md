@@ -2,7 +2,7 @@
 
 A stylish focus indicator
 
-See the [component page](http://robrez.github.io/paper-focusline/components/paper-focusline/index.html)
+See the [component page](http://robrez.github.io/paper-focusline/)
 
 ## Installing
 
